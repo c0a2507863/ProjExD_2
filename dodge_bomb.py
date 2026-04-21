@@ -13,6 +13,19 @@ DELTA = {
 }
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
+def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
+    """
+    引数で与えられたRectが画面内か画面が以下を判定する関数
+    引数：こうかとんRectまたは爆弾Rect
+    戻り値：横方向、縦方向判定結果（True: 画面内, False: 画面外）
+    """
+    yoko, tate = True, True
+    if rct.left < 0 or WIDTH < rct.right:   #横方向判定
+        yoko = False
+    if rct.top < 0 or HEIGHT < rct.bottom:  #縦方向判定
+        tate = False
+    return yoko, tate
+    
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
@@ -22,12 +35,12 @@ def main():
     kk_rct = kk_img.get_rect()
     kk_rct.center = 300, 200
 
-    bb_img = pg.Surface((20, 20))  #爆弾用の空のSurfaceを作る
-    pg.draw.circle(bb_img, (255, 0, 0), (10, 10), 10)  #爆弾を描く
-    bb_img.set_colorkey((0, 0, 0)) #黒い枠を透明にする
-    bb_rct = bb_img.get_rect()  #爆弾Rectを取得する
-    bb_rct.centerx = random.randint(0, WIDTH)   #爆弾の初期座標x
-    bb_rct.centery = random.randint(0, HEIGHT)  #爆弾の初期座標y
+    bb_img = pg.Surface((20, 20))                       #爆弾用の空のSurfaceを作る
+    pg.draw.circle(bb_img, (255, 0, 0), (10, 10), 10)   #爆弾を描く
+    bb_img.set_colorkey((0, 0, 0))                      #黒い枠を透明にする
+    bb_rct = bb_img.get_rect()                          #爆弾Rectを取得する
+    bb_rct.centerx = random.randint(0, WIDTH)           #爆弾の初期座標x
+    bb_rct.centery = random.randint(0, HEIGHT)          #爆弾の初期座標y
     vx, vy = +5, +5
 
     clock = pg.time.Clock()
@@ -53,9 +66,16 @@ def main():
                 sum_mv[0] += mv[0]
                 sum_mv[1] += mv[1]
         kk_rct.move_ip(sum_mv)
+        if check_bound(kk_rct) != (True, True):
+            kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
         screen.blit(kk_img, kk_rct)
-        bb_rct.move_ip(vx, vy)
-        screen.blit(bb_img, bb_rct)  #爆弾を表示させる
+        bb_rct.move_ip(vx, vy)          #爆弾を動かす
+        yoko, tate = check_bound(bb_rct)
+        if not yoko:
+            vx *= -1
+        if not tate:
+            vy *= -1
+        screen.blit(bb_img, bb_rct)     #爆弾を表示させる
         pg.display.update()
         tmr += 1
         clock.tick(50)
