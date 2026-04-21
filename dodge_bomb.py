@@ -28,6 +28,7 @@ def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
     return yoko, tate
 
 
+#演習課題1の関数
 def gameover(screen: pg.Surface) -> None:
     """
     爆弾とこうかとんが衝突したら画面を暗くし、Game Overの文字とこうかとんを表示する
@@ -58,6 +59,7 @@ def gameover(screen: pg.Surface) -> None:
     time.sleep(5)
 
 
+#演習課題2の関数
 def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
     """
     10段階の大きさを変えた爆弾Surfaceのリストと加速度のリストを準備する
